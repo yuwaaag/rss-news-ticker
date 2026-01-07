@@ -1,7 +1,7 @@
 const rssFeeds = [
-  "https://www.amarujala.com/rss/breaking-news.xml",
-  "https://www.jagran.com/rss/breaking-news.xml",
-  "https://www.livehindustan.com/rss/breaking-news.xml"
+  "https://pib.gov.in/rss/AllRelease.xml",
+  "https://feeds.feedburner.com/ndtvnews-latest",
+  "https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best"
 ];
 
 async function loadRSS() {
