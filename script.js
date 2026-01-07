@@ -31,4 +31,4 @@ async function loadRSS() {
 }
 
 loadRSS();
-setInterval(loadRSS, 300000); // 10 minute refresh
+setInterval(loadRSS, 600000); // 10 minute refresh
