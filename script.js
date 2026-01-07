@@ -1,34 +1,28 @@
-const rssFeeds = [
-  "https://feeds.feedburner.com/ndtvnews-latest",
-  "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms",
-  "https://pib.gov.in/rss/AllRelease.xml"
-];
+const rssUrl = "https://api.allorigins.win/get?url=" +
+encodeURIComponent("https://feeds.feedburner.com/ndtvnews-latest");
 
 async function loadRSS() {
-  let headlines = "";
+  try {
+    const res = await fetch(rssUrl);
+    const data = await res.json();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, "text/xml");
 
-  for (let feed of rssFeeds) {
-    try {
-      const api =
-        "https://api.rss2json.com/v1/api.json?rss_url=" +
-        encodeURIComponent(feed);
+    const items = xml.querySelectorAll("item");
+    let headlines = "";
 
-      const res = await fetch(api);
-      const data = await res.json();
-
-      if (data.items) {
-        data.items.slice(0, 4).forEach(item => {
-          headlines += " 🔴 " + item.title;
-        });
+    items.forEach((item, index) => {
+      if (index < 10) {
+        headlines += " 🔴 " + item.querySelector("title").textContent;
       }
-    } catch (e) {
-      console.log("RSS error:", feed);
-    }
-  }
+    });
 
-  document.getElementById("newsTicker").innerText =
-    headlines || "ताज़ा खबरें लोड हो रही हैं...";
+    document.getElementById("newsTicker").innerText = headlines;
+  } catch (e) {
+    document.getElementById("newsTicker").innerText =
+      "Breaking News Updating...";
+  }
 }
 
 loadRSS();
-setInterval(loadRSS, 600000); // 10 minute refresh
+setInterval(loadRSS, 300000); // 5 minutes auto refresh
