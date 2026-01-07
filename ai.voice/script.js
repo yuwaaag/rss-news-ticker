@@ -1,31 +1,50 @@
-const rssUrl =
-  "https://api.allorigins.win/get?url=" +
-  encodeURIComponent("https://feeds.feedburner.com/ndtvnews-latest");
+const rssFeeds = [
+  "https://www.amarujala.com/rss/breaking-news.xml",
+  "https://www.jagran.com/rss/breaking-news.xml",
+  "https://www.livehindustan.com/rss/breaking-news.xml"
+];
 
-async function startNews() {
-  const res = await fetch(rssUrl);
-  const data = await res.json();
+let lastSpoken = "";
+const intervalMinutes = 5; // 5 minute baad nayi news
 
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(data.contents, "text/xml");
-  const items = xml.querySelectorAll("item");
+async function fetchRSS() {
+  for (let feed of rssFeeds) {
+    try {
+      const res = await fetch(
+        `https://api.allorigins.win/get?url=${encodeURIComponent(feed)}`
+      );
+      const data = await res.json();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(data.contents, "text/xml");
+      const item = xml.querySelector("item > title");
 
-  let text = "";
-  items.forEach((item, i) => {
-    if (i < 3) {
-      text += item.querySelector("title").textContent + ". ";
+      if (item) {
+        const title = item.textContent.trim();
+        if (title !== lastSpoken) {
+          speakHindi(title);
+          lastSpoken = title;
+        }
+        break;
+      }
+    } catch (e) {
+      console.log("RSS error", e);
     }
-  });
-
-  speak(text);
+  }
 }
 
-function speak(text) {
+function speakHindi(text) {
   const msg = new SpeechSynthesisUtterance();
-  msg.text = text;
-  msg.lang = "hi-IN";   // Hindi voice
+  msg.text = "ताज़ा खबर। " + text;
+  msg.lang = "hi-IN";
   msg.rate = 0.9;
   msg.pitch = 1;
+  msg.volume = 1;
 
-  window.speechSynthesis.speak(msg);
+  speechSynthesis.cancel();
+  speechSynthesis.speak(msg);
 }
+
+document.getElementById("startBtn").onclick = () => {
+  fetchRSS();
+  setInterval(fetchRSS, intervalMinutes * 60 * 1000);
+};
