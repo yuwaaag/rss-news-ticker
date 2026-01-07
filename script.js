@@ -1,5 +1,8 @@
-const rssUrl = "https://api.allorigins.win/get?url=" +
-encodeURIComponent("https://feeds.feedburner.com/ndtvnews-latest");
+const rssFeeds = [
+  "https://www.amarujala.com/rss/breaking-news.xml",
+  "https://www.jagran.com/rss/breaking-news.xml",
+  "https://www.livehindustan.com/rss/breaking-news.xml"
+];
 
 async function loadRSS() {
   try {
